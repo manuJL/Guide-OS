@@ -8,10 +8,12 @@
 export const OLLAMA_BASE = '/api/ollama';
 
 // Ordered, best-first list of open-weight models we support. More backups can
-// be appended later; selection always picks the first one that is installed.
+// be appended later; selection always picks the first one that is installed,
+// and a failed load falls through to the next installed model.
 export const MODEL_CHAIN = [
   { id: 'qwen3:30b', label: 'Qwen3-30B-A3B (best quality, ~20 GB memory)' },
   { id: 'qwen3:8b', label: 'Qwen3-8B (backup, ~6 GB memory)' },
+  { id: 'gemma3:4b', label: 'Gemma3-4B (lightweight fallback, ~4 GB memory)' },
 ] as const;
 
 export type ModelId = (typeof MODEL_CHAIN)[number]['id'];

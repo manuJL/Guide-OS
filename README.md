@@ -51,10 +51,11 @@ How it decides what to say:
   always clear when an answer came from the guide and when it came from the model's own
   knowledge.
 
-The model choice adapts to your machine. GuideOS prefers `qwen3:30b` and falls back to the
-smaller `qwen3:8b` if the big one can't fit in memory or takes too long to start. You can pin
-either one from the dropdown, or force one at build time with `VITE_OLLAMA_MODEL`. Replies
-stream in as they're generated, with a **Stop** button to cut it short.
+The model choice adapts to your machine. GuideOS prefers `qwen3:30b`, then `qwen3:8b`, then
+the lightweight `gemma3:4b`, and falls back down that list if a model can't fit in memory or
+takes too long to start. You can pin any of them from the dropdown, or force one at build
+time with `VITE_OLLAMA_MODEL`. Replies stream in as they're generated, with a **Stop** button
+to cut it short.
 
 ## What's inside
 
@@ -126,6 +127,7 @@ Approximate memory needed:
 | --- | --- | --- |
 | `qwen3:30b` | ~18 GB | ~20 GB |
 | `qwen3:8b` | ~5 GB | ~6 GB |
+| `gemma3:4b` | ~3 GB | ~4 GB |
 
 To force a single model and skip the automatic choice, create a `.env` file:
 
