@@ -73,9 +73,10 @@ export interface Contact {
 // Gallery photo
 export interface GalleryPhoto {
   id: string;
-  color: string; // gradient colors for simulated photos
+  color: string; // accent color for simulated photos
   label: string;
   gradient: string;
+  scene?: string; // key for the self-contained scene thumbnail
 }
 
 // Voice recognition state

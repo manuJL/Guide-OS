@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Language } from './types';
+import { Language } from '../types';
 
 export const SPEECH_LANG_CODE: Record<Language, string> = {
   en: 'en-IN',

@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PhoneScreen, Language, GalleryPhoto, TutorialStep } from './types';
-import { t } from './i18n';
+import { t } from './i18n/strings';
 import { contacts, galleryPhotos } from './phoneData';
+import {
+  HomeAppIcon,
+  CameraGlyph, PaperclipIcon, ImageIcon, MapPinIcon, FileIcon, UserIcon,
+  SmileIcon, SendIcon, WifiIcon, BluetoothIcon, BrightnessIcon, VolumeIcon,
+  SignalIcon, BatteryIcon, ClockIcon,
+} from './icons';
+import { PhotoThumb } from './photoScenes';
 
 // Avatar color map
 const avatarColors: Record<string, string> = {
@@ -11,6 +18,8 @@ const avatarColors: Record<string, string> = {
   meera: '#ec4899',
   amit: '#3b82f6',
 };
+
+const initials = (name: string): string => name.trim().charAt(0).toUpperCase() || '?';
 
 interface PhoneSimulatorProps {
   screen: PhoneScreen;
@@ -61,11 +70,12 @@ export default function PhoneSimulator({
       <div className="phone-status-bar">
         <span className="status-time">9:41</span>
         <span className="status-icons">
-          <span>📶</span>
-          <span>🔋</span>
+          <SignalIcon className="status-icon" />
+          <WifiIcon className="status-icon" size={14} />
+          <BatteryIcon className="status-icon" />
         </span>
       </div>
-      <div className="phone-notch" />
+      <div className="phone-island" />
 
       {/* Screen Content */}
       <div className="phone-screen">
@@ -110,7 +120,7 @@ export default function PhoneSimulator({
           <SettingsMain s={s} cls={cls} handleClick={handleClick} />
         )}
         {screen === 'settings-wifi' && (
-          <SettingsWifi s={s} />
+          <SettingsWifi s={s} cls={cls} handleClick={handleClick} />
         )}
       </div>
 
@@ -132,13 +142,13 @@ export default function PhoneSimulator({
 // ===== Home Screen =====
 function HomeScreen({ s, cls, handleClick }: { s: any; cls: (id: string, base: string) => string; handleClick: (id: string) => void }) {
   const apps = [
-    { id: 'app-whatsapp', icon: '💬', label: s.appWhatsApp, colorClass: 'whatsapp' },
-    { id: 'app-photos', icon: '🖼️', label: s.appPhotos, colorClass: 'photos' },
-    { id: 'app-camera', icon: '📷', label: s.appCamera, colorClass: 'camera' },
-    { id: 'app-phone', icon: '📞', label: s.appPhone, colorClass: 'phone' },
-    { id: 'app-messages', icon: '✉️', label: s.appMessages, colorClass: 'messages' },
-    { id: 'app-settings', icon: '⚙️', label: s.appSettings, colorClass: 'settings' },
-    { id: 'app-clock', icon: '🕐', label: s.appClock, colorClass: 'clock' },
+    { id: 'app-whatsapp', label: s.appWhatsApp, colorClass: 'whatsapp' },
+    { id: 'app-photos', label: s.appPhotos, colorClass: 'photos' },
+    { id: 'app-camera', label: s.appCamera, colorClass: 'camera' },
+    { id: 'app-phone', label: s.appPhone, colorClass: 'phone' },
+    { id: 'app-messages', label: s.appMessages, colorClass: 'messages' },
+    { id: 'app-settings', label: s.appSettings, colorClass: 'settings' },
+    { id: 'app-clock', label: s.appClock, colorClass: 'clock' },
   ];
 
   return (
@@ -156,7 +166,7 @@ function HomeScreen({ s, cls, handleClick }: { s: any; cls: (id: string, base: s
             onClick={() => handleClick(app.id)}
           >
             <div className={`app-icon ${app.colorClass}`}>
-              {app.icon}
+              <HomeAppIcon id={app.id as any} />
             </div>
             <span className="app-icon-label">{app.label}</span>
           </div>
@@ -166,7 +176,7 @@ function HomeScreen({ s, cls, handleClick }: { s: any; cls: (id: string, base: s
   );
 }
 
-// ===== WhatsApp Contacts =====
+// ===== WhatsApp Status bar icons renderer =====
 function WhatsAppContacts({ s, cls, handleClick }: { s: any; cls: (id: string, base: string) => string; handleClick: (id: string) => void }) {
   return (
     <div className="wa-screen">
@@ -188,8 +198,8 @@ function WhatsAppContacts({ s, cls, handleClick }: { s: any; cls: (id: string, b
               className={cls(contactId, 'wa-contact-item')}
               onClick={() => handleClick(contactId)}
             >
-              <div className="wa-contact-avatar" style={{ background: avatarColors[contact.id] || '#666' }}>
-                {contact.avatar}
+              <div className="wa-contact-avatar" style={{ background: avatarColors[contact.id] || '#666', color: '#fff' }}>
+                {initials(contact.name)}
               </div>
               <div className="wa-contact-info">
                 <div className="wa-contact-name">{contact.name}</div>
@@ -216,8 +226,20 @@ function WhatsAppChat({ s, cls, handleClick, showAttachMenu = false }: {
   return (
     <div className="wa-screen" style={{ position: 'relative' }}>
       <div className="wa-chat-header">
-        <div className="wa-chat-avatar" style={{ background: '#00a884' }}>👤</div>
+        <div className="wa-chat-avatar" style={{ background: '#00a884', color: '#fff', fontWeight: 600 }}>
+          A
+        </div>
         <div className="wa-chat-name">Alex</div>
+        <div className="wa-chat-header-icons">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aebac1" strokeWidth="1.8" strokeLinecap="round">
+            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" />
+          </svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#aebac1">
+            <circle cx="12" cy="5" r="1.8" />
+            <circle cx="12" cy="12" r="1.8" />
+            <circle cx="12" cy="19" r="1.8" />
+          </svg>
+        </div>
       </div>
       <div className="wa-chat-body">
         <div className="wa-chat-bubble received">
@@ -230,7 +252,9 @@ function WhatsAppChat({ s, cls, handleClick, showAttachMenu = false }: {
         </div>
       </div>
       <div className="wa-chat-input-bar">
-        <button className="wa-emoji-btn" id="wa-emoji-btn" onClick={() => handleClick('wa-emoji-btn')}>😊</button>
+        <button className="wa-emoji-btn" id="wa-emoji-btn" onClick={() => handleClick('wa-emoji-btn')}>
+          <SmileIcon size={22} />
+        </button>
         <input className="wa-msg-input" placeholder={s.typeMessage} readOnly />
         <button
           id="btn-attach"
@@ -238,9 +262,11 @@ function WhatsAppChat({ s, cls, handleClick, showAttachMenu = false }: {
           onClick={() => handleClick('btn-attach')}
           title="Attach"
         >
-          📎
+          <PaperclipIcon size={22} />
         </button>
-        <button className="wa-camera-btn" id="wa-camera-btn" onClick={() => handleClick('wa-camera-btn')}>📷</button>
+        <button className="wa-camera-btn" id="wa-camera-btn" onClick={() => handleClick('wa-camera-btn')}>
+          <CameraGlyph size={22} />
+        </button>
       </div>
 
       {showAttachMenu && (
@@ -250,23 +276,23 @@ function WhatsAppChat({ s, cls, handleClick, showAttachMenu = false }: {
             className={cls('attach-gallery', 'wa-attach-option')}
             onClick={() => handleClick('attach-gallery')}
           >
-            <div className="wa-attach-icon gallery">🖼️</div>
+            <div className="wa-attach-icon gallery"><ImageIcon size={24} /></div>
             <span className="wa-attach-label">{s.galleryOption}</span>
           </button>
           <button className={cls('attach-camera', 'wa-attach-option')} onClick={() => handleClick('attach-camera')}>
-            <div className="wa-attach-icon camera">📷</div>
+            <div className="wa-attach-icon camera"><CameraGlyph size={24} /></div>
             <span className="wa-attach-label">{s.cameraOption}</span>
           </button>
           <button className={cls('attach-document', 'wa-attach-option')} onClick={() => handleClick('attach-document')}>
-            <div className="wa-attach-icon document">📄</div>
+            <div className="wa-attach-icon document"><FileIcon size={24} /></div>
             <span className="wa-attach-label">{s.documentOption}</span>
           </button>
           <button className={cls('attach-location', 'wa-attach-option')} onClick={() => handleClick('attach-location')}>
-            <div className="wa-attach-icon location">📍</div>
+            <div className="wa-attach-icon location"><MapPinIcon size={24} /></div>
             <span className="wa-attach-label">{s.locationOption}</span>
           </button>
           <button className={cls('attach-contact', 'wa-attach-option')} onClick={() => handleClick('attach-contact')}>
-            <div className="wa-attach-icon contact">👤</div>
+            <div className="wa-attach-icon contact"><UserIcon size={24} /></div>
             <span className="wa-attach-label">{s.contactOption}</span>
           </button>
         </div>
@@ -300,9 +326,8 @@ function GalleryScreen({ s, cls, handleClick, currentStep, tutorialActive }: {
               id={photo.id}
               className={photoCls}
               onClick={() => handleClick(photo.id)}
-              style={{ background: photo.gradient }}
             >
-              <div className="gallery-item-inner">{photo.label}</div>
+              <PhotoThumb photo={photo} className="gallery-photo" />
             </div>
           );
         })}
@@ -319,12 +344,11 @@ function PhotoPreview({ s, cls, handleClick, selectedPhoto }: {
   return (
     <div className="photo-preview-screen">
       <div className="photo-preview-header">
+        <div className="wa-chat-avatar" style={{ background: '#00a884', color: '#fff', fontWeight: 600 }}>A</div>
         <div className="gallery-title">Alex</div>
       </div>
       <div className="photo-preview-body">
-        <div className="photo-preview-img" style={{ background: photo.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px' }}>
-          {photo.label}
-        </div>
+        <PhotoThumb photo={photo} className="photo-preview-img" />
       </div>
       <div className="photo-preview-footer">
         <input className="photo-caption-input" placeholder={s.typeMessage} readOnly />
@@ -332,8 +356,9 @@ function PhotoPreview({ s, cls, handleClick, selectedPhoto }: {
           id="btn-send-photo"
           className={cls('btn-send-photo', 'btn-send-photo')}
           onClick={() => handleClick('btn-send-photo')}
+          title={s.sendPhoto}
         >
-          ➤
+          <SendIcon size={20} />
         </button>
       </div>
     </div>
@@ -346,7 +371,7 @@ function MessageSentScreen({ s, selectedPhoto }: { s: any; selectedPhoto: Galler
   return (
     <div className="message-sent-screen">
       <div className="wa-chat-header">
-        <div className="wa-chat-avatar" style={{ background: '#00a884' }}>👤</div>
+        <div className="wa-chat-avatar" style={{ background: '#00a884', color: '#fff', fontWeight: 600 }}>A</div>
         <div className="wa-chat-name">Alex</div>
       </div>
       <div className="wa-chat-body">
@@ -359,18 +384,14 @@ function MessageSentScreen({ s, selectedPhoto }: { s: any; selectedPhoto: Galler
           <div className="bubble-time">10:30 AM ✓✓</div>
         </div>
         <div className="wa-chat-photo-bubble">
-          <div className="wa-chat-photo-img" style={{ background: photo.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
-            {photo.label}
-          </div>
+          <PhotoThumb photo={photo} className="wa-chat-photo-img" />
           <div className="wa-chat-photo-meta">
             <span>10:31 AM</span>
             <span>✓✓</span>
           </div>
         </div>
       </div>
-      <div style={{ textAlign: 'center', padding: '12px', color: '#00a884', fontSize: '14px', fontWeight: 600 }}>
-        {s.photoSent}
-      </div>
+      <div className="wa-photo-sent-note">{s.photoSent}</div>
     </div>
   );
 }
@@ -400,13 +421,14 @@ function ClockMain({ s, cls, handleClick }: { s: any; cls: (id: string, base: st
           {s.stopwatchTab}
         </button>
       </div>
-      <div className="clock-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ fontSize: '72px', fontWeight: 200, color: '#e9edef' }}>
-          9:41
+      <div className="clock-body clock-body-center">
+        <div className="clock-analog-ring">
+          <div className="clock-analog-hand hour-hand" />
+          <div className="clock-analog-hand minute-hand" />
+          <div className="clock-analog-center" />
         </div>
-        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
-          Sunday, Oct 11
-        </div>
+        <div className="clock-digital-time">9:41</div>
+        <div className="clock-digital-date">Sunday, Oct 11</div>
       </div>
     </div>
   );
@@ -432,14 +454,14 @@ function ClockAlarmList({ s, cls, handleClick }: { s: any; cls: (id: string, bas
               <div className="alarm-time-display">6:30 AM</div>
               <div className="alarm-label">Weekdays</div>
             </div>
-            <button className="alarm-toggle on" />
+            <button className="alarm-toggle on" aria-label="Alarm on" />
           </div>
           <div className="alarm-item">
             <div>
               <div className="alarm-time-display">8:00 AM</div>
               <div className="alarm-label">Weekends</div>
             </div>
-            <button className="alarm-toggle" />
+            <button className="alarm-toggle" aria-label="Alarm off" />
           </div>
         </div>
         <button
@@ -447,7 +469,7 @@ function ClockAlarmList({ s, cls, handleClick }: { s: any; cls: (id: string, bas
           className={cls('btn-add-alarm', 'btn-add-alarm')}
           onClick={() => handleClick('btn-add-alarm')}
         >
-          + {s.addAlarm}
+          <span className="btn-add-alarm-plus">+</span> {s.addAlarm}
         </button>
       </div>
     </div>
@@ -479,14 +501,14 @@ function ClockAddAlarm({ s, cls, handleClick, hour, minute, amPm, setHour, setMi
               <button className="time-spinner-btn" onClick={incHour}>▲</button>
               <div className="time-display">{pad(hour)}</div>
               <button className="time-spinner-btn" onClick={decHour}>▼</button>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>{s.setHour}</div>
+              <div className="time-spinner-label">{s.setHour}</div>
             </div>
             <div className="time-separator">:</div>
             <div className="time-spinner">
               <button className="time-spinner-btn" onClick={incMin}>▲</button>
               <div className="time-display">{pad(minute)}</div>
               <button className="time-spinner-btn" onClick={decMin}>▼</button>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>{s.setMinute}</div>
+              <div className="time-spinner-label">{s.setMinute}</div>
             </div>
             <div className="am-pm-toggle">
               <button
@@ -531,7 +553,7 @@ function ClockAlarmSaved({ s, hour, minute, amPm }: { s: any; hour: number; minu
       </div>
       <div className="clock-body">
         <div className="alarm-saved-screen">
-          <div className="alarm-saved-icon">⏰</div>
+          <div className="alarm-saved-icon"><ClockIcon size={46} /></div>
           <div className="alarm-saved-text">{s.alarmSaved}</div>
           <div className="alarm-saved-time">{pad(hour)}:{pad(minute)} {amPm}</div>
         </div>
@@ -543,10 +565,10 @@ function ClockAlarmSaved({ s, hour, minute, amPm }: { s: any; hour: number; minu
 // ===== Settings Main =====
 function SettingsMain({ s, cls, handleClick }: { s: any; cls: (id: string, base: string) => string; handleClick: (id: string) => void }) {
   const items = [
-    { id: 'setting-wifi', icon: '📡', label: s.wifiSetting, sub: s.wifiOff, colorClass: 'wifi' },
-    { id: 'setting-bluetooth', icon: '📲', label: s.bluetoothSetting, sub: s.wifiOff, colorClass: 'bluetooth' },
-    { id: 'setting-display', icon: '🔆', label: s.displaySetting, sub: '', colorClass: 'display' },
-    { id: 'setting-sound', icon: '🔊', label: s.soundSetting, sub: '', colorClass: 'sound' },
+    { id: 'setting-wifi', glyph: <WifiIcon size={21} />, label: s.wifiSetting, sub: s.wifiOff, colorClass: 'wifi' },
+    { id: 'setting-bluetooth', glyph: <BluetoothIcon size={21} />, label: s.bluetoothSetting, sub: s.wifiOff, colorClass: 'bluetooth' },
+    { id: 'setting-display', glyph: <BrightnessIcon size={21} />, label: s.displaySetting, sub: '', colorClass: 'display' },
+    { id: 'setting-sound', glyph: <VolumeIcon size={21} />, label: s.soundSetting, sub: '', colorClass: 'sound' },
   ];
 
   return (
@@ -562,10 +584,15 @@ function SettingsMain({ s, cls, handleClick }: { s: any; cls: (id: string, base:
             className={cls(item.id, 'settings-item')}
             onClick={() => handleClick(item.id)}
           >
-            <div className={`settings-icon ${item.colorClass}`}>{item.icon}</div>
+            <div className={`settings-icon ${item.colorClass}`}>{item.glyph}</div>
             <div className="settings-item-text">
               <div className="settings-item-title">{item.label}</div>
               {item.sub && <div className="settings-item-subtitle">{item.sub}</div>}
+            </div>
+            <div className="settings-item-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
             </div>
           </div>
         ))}
@@ -575,17 +602,37 @@ function SettingsMain({ s, cls, handleClick }: { s: any; cls: (id: string, base:
 }
 
 // ===== Settings WiFi =====
-function SettingsWifi({ s }: { s: any }) {
+function SettingsWifi({ s, cls, handleClick }: { s: any; cls: (id: string, base: string) => string; handleClick: (id: string) => void }) {
+  const [on, setOn] = useState(false);
   return (
     <div className="settings-screen">
       <div className="settings-header">
         <div className="settings-header-title">{s.wifiSetting}</div>
       </div>
       <div className="settings-list">
-        <div className="wifi-success">
-          <div className="wifi-success-icon">📡</div>
-          <div className="wifi-success-text">{s.wifiTurnedOn}</div>
+        <div
+          id="setting-wifi-toggle"
+          className={cls('setting-wifi-toggle', 'settings-item')}
+          onClick={() => {
+            setOn(true);
+            handleClick('setting-wifi-toggle');
+          }}
+        >
+          <div className="settings-icon wifi"><WifiIcon size={21} /></div>
+          <div className="settings-item-text">
+            <div className="settings-item-title">{s.wifiSetting}</div>
+            <div className="settings-item-subtitle">{on ? s.wifiOn : s.wifiOff}</div>
+          </div>
+          <div className={`wifi-switch ${on ? 'on' : ''}`}>
+            <div className="wifi-switch-knob" />
+          </div>
         </div>
+        {on && (
+          <div className="wifi-success">
+            <div className="wifi-success-icon"><WifiIcon size={48} /></div>
+            <div className="wifi-success-text">{s.wifiTurnedOn}</div>
+          </div>
+        )}
       </div>
     </div>
   );

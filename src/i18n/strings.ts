@@ -1,4 +1,4 @@
-import { Language } from './types';
+import { Language } from '../types';
 
 export interface I18nStrings {
   // App chrome
@@ -428,7 +428,9 @@ const te: I18nStrings = {
 const translations: Record<Language, I18nStrings> = { en, hi, te };
 
 export function t(lang: Language): I18nStrings {
-  return translations[lang];
+  // Fall back to English for any key missing (or empty) in the target language.
+  if (lang === 'en') return translations.en;
+  return { ...translations.en, ...translations[lang] };
 }
 
 export function formatStep(template: string, current: number, total: number): string {

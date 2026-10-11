@@ -262,4 +262,95 @@ export const tutorials: Record<string, Tutorial> = {
       },
     ],
   },
+
+  'turn-on-wifi': {
+    id: 'turn-on-wifi',
+    title: {
+      en: 'Turn on Wi-Fi',
+      hi: 'Wi-Fi चालू करें',
+      te: 'Wi-Fi ఆన్ చేయండి',
+    },
+    steps: [
+      {
+        id: 'wf-1',
+        screen: 'home',
+        targetElementId: 'app-settings',
+        instruction: {
+          en: 'Open the Settings app.',
+          hi: 'सेटिंग्स ऐप खोलें।',
+          te: 'సెట్టింగ్స్ యాప్ తెరవండి.',
+        },
+        targetLabel: {
+          en: 'The Settings app icon on your home screen',
+          hi: 'होम स्क्रीन पर सेटिंग्स ऐप आइकन',
+          te: 'హోమ్ స్క్రీన్‌లోని సెట్టింగ్స్ యాప్ ఐకాన్',
+        },
+        whyThisStep: {
+          en: 'Wi-Fi is controlled from the Settings app.',
+          hi: 'Wi-Fi को सेटिंग्स ऐप से नियंत्रित किया जाता है।',
+          te: 'Wi-Fi ని సెట్టింగ్స్ యాప్ నుండి నియంత్రిస్తారు.',
+        },
+      },
+      {
+        id: 'wf-2',
+        screen: 'settings-main',
+        targetElementId: 'setting-wifi',
+        instruction: {
+          en: 'Open Wi-Fi settings.',
+          hi: 'Wi-Fi सेटिंग्स खोलें।',
+          te: 'Wi-Fi సెట్టింగ్స్ తెరవండి.',
+        },
+        targetLabel: {
+          en: 'The Wi-Fi option at the top of Settings',
+          hi: 'सेटिंग्स के ऊपर Wi-Fi विकल्प',
+          te: 'సెట్టింగ్స్ పైన ఉన్న Wi-Fi ఆప్షన్',
+        },
+        whyThisStep: {
+          en: 'This is where you can turn Wi-Fi on or off.',
+          hi: 'यहां आप Wi-Fi चालू या बंद कर सकते हैं।',
+          te: 'ఇక్కడే మీరు Wi-Fi ని ఆన్ లేదా ఆఫ్ చేయవచ్చు.',
+        },
+      },
+      {
+        id: 'wf-3',
+        screen: 'settings-wifi',
+        targetElementId: 'setting-wifi-toggle',
+        instruction: {
+          en: 'Tap the Wi-Fi switch to turn it on.',
+          hi: 'Wi-Fi चालू करने के लिए स्विच पर टैप करें।',
+          te: 'Wi-Fi ఆన్ చేయడానికి స్విచ్ టాప్ చేయండి.',
+        },
+        targetLabel: {
+          en: 'The Wi-Fi switch at the top of the screen',
+          hi: 'स्क्रीन के ऊपर Wi-Fi स्विच',
+          te: 'స్క్రీన్ పైన ఉన్న Wi-Fi స్విచ్',
+        },
+        whyThisStep: {
+          en: 'The switch shows the current state. Tapping it flips Wi-Fi on.',
+          hi: 'स्विच वर्तमान स्थिति दिखाता है। इसे टैप करने से Wi-Fi चालू हो जाता है।',
+          te: 'స్విచ్ ప్రస్తుత స్థితిని చూపుతుంది. దానిని టాప్ చేస్తే Wi-Fi ఆన్ అవుతుంది.',
+        },
+      },
+      {
+        id: 'wf-4',
+        screen: 'settings-wifi',
+        targetElementId: '',
+        instruction: {
+          en: '🎉 Wi-Fi is now turned on!',
+          hi: '🎉 Wi-Fi अब चालू हो गया है!',
+          te: '🎉 Wi-Fi ఇప్పుడు ఆన్ చేయబడింది!',
+        },
+        targetLabel: {
+          en: 'The task is complete',
+          hi: 'कार्य पूरा हो गया',
+          te: 'పని పూర్తయింది',
+        },
+        whyThisStep: {
+          en: 'Wi-Fi is now enabled so you can connect to networks and access the internet.',
+          hi: 'Wi-Fi अब सक्रिय है, जिससे आप नेटवर्क से जुड़कर इंटरनेट का उपयोग कर सकते हैं।',
+          te: 'Wi-Fi ఇప్పుడు ఆన్ అయింది, కాబట్టి మీరు నెట్‌వర్క్‌లకు కనెక్ట్ అయ్యి ఇంటర్నెట్ ఉపయోగించవచ్చు.',
+        },
+      },
+    ],
+  },
 };

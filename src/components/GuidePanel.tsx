@@ -1,9 +1,9 @@
 import React, { KeyboardEvent, useEffect, useRef } from 'react';
-import { Language, Tutorial } from './types';
-import { t } from './i18n';
-import { NarrationStatus } from './useNarration';
+import { Language, Tutorial } from '../types';
+import { t } from '../i18n/strings';
+import { NarrationStatus } from '../voice/useNarration';
 
-interface TutorialManualProps {
+interface GuidePanelProps {
   tutorial: Tutorial;
   stepIndex: number;
   isComplete: boolean;
@@ -25,7 +25,7 @@ interface TutorialManualProps {
   onTryAnother: () => void;
 }
 
-export default function TutorialManual({
+export default function GuidePanel({
   tutorial,
   stepIndex,
   isComplete,
@@ -45,7 +45,7 @@ export default function TutorialManual({
   onRestart,
   onExit,
   onTryAnother,
-}: TutorialManualProps): React.ReactElement | null {
+}: GuidePanelProps): React.ReactElement | null {
   const s = t(lang);
   const panelRef = useRef<HTMLDivElement>(null);
   const totalSteps = tutorial.steps.length;

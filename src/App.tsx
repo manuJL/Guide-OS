@@ -3,13 +3,14 @@ import {
   PhoneScreen, ChatMessage, TutorialState,
   VoiceState, GalleryPhoto,
 } from './types';
-import { t } from './i18n';
+import { t } from './i18n/strings';
 import { classifyIntent, detectLanguage, exampleRequests } from './intentClassifier';
 import { tutorials } from './tutorials';
 import PhoneSimulator from './PhoneSimulator';
-import TutorialManual from './TutorialManual';
-import { useNarration } from './useNarration';
+import GuidePanel from './components/GuidePanel';
+import { useNarration } from './voice/useNarration';
 import { getAllGalleryPhotos } from './phoneData';
+import { GuideMark } from './icons';
 
 let msgIdCounter = 0;
 function newMsgId() {
@@ -23,9 +24,21 @@ const speechLangCodes: Record<string, string> = {
   te: 'te-IN',
 };
 
+const LANG_STORAGE_KEY = 'guideos-lang';
+
+function loadSavedLanguage(): 'en' | 'hi' | 'te' {
+  try {
+    const stored = window.localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored === 'en' || stored === 'hi' || stored === 'te') return stored;
+  } catch (e) {
+    // localStorage unavailable (private mode, blocked) — default to English
+  }
+  return 'en';
+}
+
 export default function App() {
   // ===== State =====
-  const [lang, setLang] = useState<'en' | 'hi' | 'te'>('en');
+  const [lang, setLang] = useState<'en' | 'hi' | 'te'>(loadSavedLanguage);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isThinking, setIsThinking] = useState(false);
@@ -57,37 +70,56 @@ export default function App() {
 
   const narration = useNarration(lang);
 
-  // ===== Narration: speak the current step =====
+  // Persist the chosen language
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, [lang]);
+
+  // ===== Narration: single effect keyed on tutorial state + speech prefs =====
+  // tutorialState, stepIndex, language, autoNarrate, muted and completed all
+  // feed one key. Any change cancels the previous utterance and (if narration
+  // is enabled and unmuted) speaks the current text. The lastSpokenKeyRef
+  // guards against React StrictMode double-invocation in dev.
+  const lastSpokenKeyRef = useRef<string | null>(null);
+  const completionSpokenRef = useRef(false);
+
   useEffect(() => {
     const active = tutorialState.activeTutorial;
-    if (!active || tutorialState.isComplete) return;
-    const step = active.steps[tutorialState.currentStepIndex];
-    if (!step) return;
-    if (narration.autoNarrate && !narration.muted) {
-      narration.speak(step.instruction[lang]);
-    } else {
-      narration.cancel();
+    const isComplete = tutorialState.isComplete;
+    const auto = narration.autoNarrate;
+    const mutedState = narration.muted;
+
+    const key = active
+      ? (isComplete
+        ? `complete:${active.id}:${lang}:${auto ? 'a' : 'x'}:${mutedState ? 'm' : 's'}`
+        : `${active.id}:${tutorialState.currentStepIndex}:${lang}:${auto ? 'a' : 'x'}:${mutedState ? 'm' : 's'}`)
+      : null;
+
+    // Unchanged state (e.g. StrictMode re-run): do nothing.
+    if (!key || lastSpokenKeyRef.current === key) return;
+
+    lastSpokenKeyRef.current = key;
+    narration.cancel();
+
+    if (!auto || mutedState) return;
+
+    if (isComplete) {
+      if (completionSpokenRef.current) return;
+      completionSpokenRef.current = true;
+      narration.speak(s.completionMessage);
+      return;
     }
-    return () => narration.cancel();
+
+    completionSpokenRef.current = false;
+    const step = active!.steps[tutorialState.currentStepIndex];
+    if (step) narration.speak(step.instruction[lang]);
   }, [
     tutorialState.activeTutorial,
     tutorialState.currentStepIndex,
-    tutorialState.isComplete,
-    lang,
-    narration.autoNarrate,
-    narration.muted,
-    narration.speak,
-    narration.cancel,
-  ]);
-
-  // ===== Narration: announce completion once =====
-  useEffect(() => {
-    if (!tutorialState.isComplete) return;
-    if (narration.autoNarrate && !narration.muted) {
-      narration.speak(s.completionMessage);
-    }
-    return () => narration.cancel();
-  }, [
     tutorialState.isComplete,
     lang,
     narration.autoNarrate,
@@ -200,9 +232,10 @@ export default function App() {
           );
           break;
         case 'turn-on-wifi':
-          setPendingTutorialId(null);
-          setPhoneScreen('settings-wifi');
-          addAssistantMessage(`📡 ${strings.wifiTurnedOn}`);
+          setPendingTutorialId('turn-on-wifi');
+          addAssistantMessage(
+            `📡 ${strings.taskRecognized}\n\n📋 ${tutorials['turn-on-wifi'].title[currentLang]}`
+          );
           break;
         case 'ambiguous':
           addAssistantMessage(
@@ -372,6 +405,9 @@ export default function App() {
         setPhoneScreen('clock-alarm-list');
         break;
       case 'setting-wifi':
+        setPhoneScreen('settings-wifi');
+        break;
+      case 'setting-wifi-toggle':
         setPhoneScreen('settings-wifi');
         break;
       case 'setting-bluetooth':
@@ -551,7 +587,9 @@ export default function App() {
       {/* Header */}
       <header className="app-header">
         <div className="logo-section">
-          <div className="logo-icon">G</div>
+          <div className="logo-icon">
+            <GuideMark size={40} />
+          </div>
           <div className="logo-text">
             <span className="logo-name">{s.appName}</span>
             <span className="logo-tagline">{s.tagline}</span>
@@ -687,7 +725,7 @@ export default function App() {
         {/* Middle Panel: Guided Manual + Narration */}
         {tutorialState.activeTutorial && (
           <div className="manual-panel">
-            <TutorialManual
+            <GuidePanel
               tutorial={tutorialState.activeTutorial}
               stepIndex={tutorialState.currentStepIndex}
               isComplete={tutorialState.isComplete}
