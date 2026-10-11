@@ -8,6 +8,7 @@ import { classifyIntent, detectLanguage, exampleRequests } from './intentClassif
 import { tutorials } from './tutorials';
 import PhoneSimulator from './PhoneSimulator';
 import GuidePanel from './components/GuidePanel';
+import AssistantChat from './components/AssistantChat';
 import { useNarration } from './voice/useNarration';
 import { getAllGalleryPhotos } from './phoneData';
 import { GuideMark } from './icons';
@@ -852,6 +853,9 @@ export default function App() {
           ⚠️ {tutorialState.wrongTapMessage}
         </div>
       )}
+
+      {/* Local-LLM AI assistant (floating button + slide-over panel) */}
+      <AssistantChat />
     </div>
   );
 }
