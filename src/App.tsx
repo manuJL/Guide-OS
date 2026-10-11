@@ -57,6 +57,7 @@ export default function App() {
   const [alarmHour, setAlarmHour] = useState(7);
   const [alarmMinute, setAlarmMinute] = useState(0);
   const [alarmAmPm, setAlarmAmPm] = useState<'AM' | 'PM'>('AM');
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const wrongTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -220,21 +221,33 @@ export default function App() {
 
       switch (intent.type) {
         case 'send-photo':
+          setShowTaskPicker(false);
           setPendingTutorialId('send-photo');
           addAssistantMessage(
             `📸 ${strings.taskRecognized}\n\n📋 ${tutorials['send-photo'].title[currentLang]}`
           );
           break;
         case 'set-alarm':
+          setShowTaskPicker(false);
           setPendingTutorialId('set-alarm');
           addAssistantMessage(
             `⏰ ${strings.taskRecognized}\n\n📋 ${tutorials['set-alarm'].title[currentLang]}`
           );
           break;
         case 'turn-on-wifi':
+          setShowTaskPicker(false);
           setPendingTutorialId('turn-on-wifi');
           addAssistantMessage(
             `📡 ${strings.taskRecognized}\n\n📋 ${tutorials['turn-on-wifi'].title[currentLang]}`
+          );
+          break;
+        case 'manual':
+          setShowTaskPicker(true);
+          addAssistantMessage(
+            `📖 ${strings.chooseTask}\n` +
+            `• ${strings.sendPhotoChip}\n` +
+            `• ${strings.setAlarmChip}\n` +
+            `• ${strings.wifiChip}`
           );
           break;
         case 'ambiguous':
@@ -275,10 +288,11 @@ export default function App() {
   }, [processRequest]);
 
   // ===== Start tutorial =====
-  const startTutorial = useCallback(() => {
-    if (!pendingTutorialId || !tutorials[pendingTutorialId]) return;
+  const startTutorial = useCallback((id?: string) => {
+    const tutorialId = id ?? pendingTutorialId;
+    if (!tutorialId || !tutorials[tutorialId]) return;
 
-    const tutorial = tutorials[pendingTutorialId];
+    const tutorial = tutorials[tutorialId];
     setTutorialState({
       activeTutorial: tutorial,
       currentStepIndex: 0,
@@ -288,7 +302,26 @@ export default function App() {
     setPhoneScreen(tutorial.steps[0].screen);
     setShowWhy(false);
     setSelectedPhoto(null);
+    setShowTaskPicker(false);
   }, [pendingTutorialId]);
+
+  // ===== "Give me manual" button =====
+  const handleGiveMeManual = useCallback(() => {
+    if (pendingTutorialId && tutorials[pendingTutorialId]) {
+      startTutorial();
+    } else {
+      setShowTaskPicker(true);
+    }
+  }, [pendingTutorialId, startTutorial]);
+
+  // ===== Select a task from the picker =====
+  const handleSelectTask = useCallback((id: 'send-photo' | 'set-alarm' | 'turn-on-wifi') => {
+    const exampleIdx = { 'send-photo': 0, 'set-alarm': 1, 'turn-on-wifi': 2 }[id];
+    addUserMessage(exampleRequests[lang][exampleIdx]);
+    setShowTaskPicker(false);
+    setPendingTutorialId(id);
+    startTutorial(id);
+  }, [lang, startTutorial, addUserMessage]);
 
   // ===== Phone element click handler =====
   const handlePhoneElementClick = useCallback((elementId: string) => {
@@ -366,6 +399,10 @@ export default function App() {
       case 'app-camera':
       case 'app-phone':
       case 'app-messages':
+      case 'app-chrome':
+      case 'app-maps':
+      case 'app-youtube':
+      case 'app-gmail':
         demoOnly();
         break;
       case 'contact-alex':
@@ -483,6 +520,7 @@ export default function App() {
     setPhoneScreen('home');
     setPendingTutorialId(null);
     setShowWhy(false);
+    setShowTaskPicker(false);
   }, [narration.cancel]);
 
   const handleTryAnother = useCallback(() => {
@@ -662,6 +700,39 @@ export default function App() {
             </div>
           )}
 
+          {/* Give Me Manual + Task Picker */}
+          {!tutorialState.activeTutorial && (
+            <div className="manual-action">
+              <button className="btn-manual" onClick={handleGiveMeManual}>
+                📖 {s.manualButton}
+              </button>
+            </div>
+          )}
+
+          {showTaskPicker && !tutorialState.activeTutorial && (
+            <div className="task-picker">
+              <div className="task-picker-title">{s.chooseTask}</div>
+              <button
+                className="task-picker-option"
+                onClick={() => handleSelectTask('send-photo')}
+              >
+                📸 {s.sendPhotoChip}
+              </button>
+              <button
+                className="task-picker-option"
+                onClick={() => handleSelectTask('set-alarm')}
+              >
+                ⏰ {s.setAlarmChip}
+              </button>
+              <button
+                className="task-picker-option"
+                onClick={() => handleSelectTask('turn-on-wifi')}
+              >
+                📡 {s.wifiChip}
+              </button>
+            </div>
+          )}
+
           {/* Chat Input */}
           <div className="chat-input-area">
             <input
@@ -715,7 +786,7 @@ export default function App() {
           {/* Start Tutorial Button */}
           {pendingTutorialId && !tutorialState.activeTutorial && (
             <div className="start-tutorial-section">
-              <button className="btn-start-tutorial" onClick={startTutorial} disabled={isThinking}>
+              <button className="btn-start-tutorial" onClick={() => startTutorial()} disabled={isThinking}>
                 ▶ {s.startTutorial}
               </button>
             </div>

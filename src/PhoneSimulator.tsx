@@ -6,7 +6,7 @@ import {
   HomeAppIcon,
   CameraGlyph, PaperclipIcon, ImageIcon, MapPinIcon, FileIcon, UserIcon,
   SmileIcon, SendIcon, WifiIcon, BluetoothIcon, BrightnessIcon, VolumeIcon,
-  SignalIcon, BatteryIcon, ClockIcon,
+  SignalIcon, BatteryIcon, ClockIcon, CheckIcon,
 } from './icons';
 import { PhotoThumb } from './photoScenes';
 
@@ -92,7 +92,7 @@ export default function PhoneSimulator({
           <WhatsAppChat s={s} cls={cls} handleClick={handleClick} showAttachMenu />
         )}
         {screen === 'gallery' && (
-          <GalleryScreen s={s} cls={cls} handleClick={handleClick} currentStep={currentStep} tutorialActive={tutorialActive} />
+          <GalleryScreen s={s} cls={cls} handleClick={handleClick} currentStep={currentStep} tutorialActive={tutorialActive} selectedPhoto={selectedPhoto} />
         )}
         {screen === 'photo-preview' && (
           <PhotoPreview s={s} cls={cls} handleClick={handleClick} selectedPhoto={selectedPhoto} />
@@ -144,6 +144,10 @@ function HomeScreen({ s, cls, handleClick }: { s: any; cls: (id: string, base: s
   const apps = [
     { id: 'app-whatsapp', label: s.appWhatsApp, colorClass: 'whatsapp' },
     { id: 'app-photos', label: s.appPhotos, colorClass: 'photos' },
+    { id: 'app-chrome', label: 'Chrome', colorClass: 'chrome' },
+    { id: 'app-maps', label: 'Maps', colorClass: 'maps' },
+    { id: 'app-youtube', label: 'YouTube', colorClass: 'youtube' },
+    { id: 'app-gmail', label: 'Gmail', colorClass: 'gmail' },
     { id: 'app-camera', label: s.appCamera, colorClass: 'camera' },
     { id: 'app-phone', label: s.appPhone, colorClass: 'phone' },
     { id: 'app-messages', label: s.appMessages, colorClass: 'messages' },
@@ -302,9 +306,9 @@ function WhatsAppChat({ s, cls, handleClick, showAttachMenu = false }: {
 }
 
 // ===== Gallery Screen =====
-function GalleryScreen({ s, cls, handleClick, currentStep, tutorialActive }: {
+function GalleryScreen({ s, cls, handleClick, currentStep, tutorialActive, selectedPhoto }: {
   s: any; cls: (id: string, base: string) => string; handleClick: (id: string) => void;
-  currentStep: TutorialStep | null; tutorialActive: boolean;
+  currentStep: TutorialStep | null; tutorialActive: boolean; selectedPhoto: GalleryPhoto | null;
 }) {
   return (
     <div className="gallery-screen">
@@ -316,9 +320,11 @@ function GalleryScreen({ s, cls, handleClick, currentStep, tutorialActive }: {
           // In tutorial mode, any gallery photo click should work for step sp-5
           const isAnyGalleryTarget = tutorialActive && currentStep?.targetElementId.startsWith('gallery-photo-');
           const photoIsHighlighted = isAnyGalleryTarget && photo.id === 'gallery-photo-1';
-          const photoCls = photoIsHighlighted
-            ? 'gallery-item tutorial-highlight'
-            : (isAnyGalleryTarget && photo.id !== 'gallery-photo-1' ? 'gallery-item' : cls(photo.id, 'gallery-item'));
+          const isSelected = selectedPhoto?.id === photo.id;
+          const photoCls = [
+            photoIsHighlighted ? 'tutorial-highlight' : cls(photo.id, 'gallery-item'),
+            isSelected ? 'selected' : '',
+          ].join(' ');
 
           return (
             <div
@@ -328,6 +334,11 @@ function GalleryScreen({ s, cls, handleClick, currentStep, tutorialActive }: {
               onClick={() => handleClick(photo.id)}
             >
               <PhotoThumb photo={photo} className="gallery-photo" />
+              {isSelected && (
+                <div className="gallery-selected-check">
+                  <CheckIcon size={16} />
+                </div>
+              )}
             </div>
           );
         })}

@@ -51,6 +51,8 @@ export interface I18nStrings {
   
   // Suggested tasks
   suggestedTasks: string;
+  manualButton: string;
+  chooseTask: string;
   sendPhotoChip: string;
   setAlarmChip: string;
   wifiChip: string;
@@ -166,6 +168,8 @@ const en: I18nStrings = {
   tapTargetLabel: 'Tap:',
   wrongTapMessage: 'Not quite! Look for the highlighted element and tap on it.',
   suggestedTasks: 'Try these tasks:',
+  manualButton: 'Give me manual',
+  chooseTask: 'Choose a task to get started:',
   sendPhotoChip: 'Send a photo on WhatsApp',
   setAlarmChip: 'Set an alarm',
   wifiChip: 'Turn on Wi-Fi',
@@ -265,6 +269,8 @@ const hi: I18nStrings = {
   tapTargetLabel: 'टैप करें:',
   wrongTapMessage: 'सही नहीं! हाइलाइट किए गए बटन को देखें और उस पर टैप करें।',
   suggestedTasks: 'ये काम करके देखें:',
+  manualButton: 'मुझे मैन्युअल दें',
+  chooseTask: 'शुरू करने के लिए एक काम चुनें:',
   sendPhotoChip: 'WhatsApp पर फोटो भेजें',
   setAlarmChip: 'अलार्म सेट करें',
   wifiChip: 'Wi-Fi चालू करें',
@@ -364,6 +370,8 @@ const te: I18nStrings = {
   tapTargetLabel: 'టాప్ చేయండి:',
   wrongTapMessage: 'సరిగ్గా కాదు! హైలైట్ చేసిన బటన్‌ను చూసి దానిపై టాప్ చేయండి.',
   suggestedTasks: 'ఈ పనులు ప్రయత్నించండి:',
+  manualButton: 'నాకు మాన్యువల్ ఇవ్వండి',
+  chooseTask: 'ప్రారంభించడానికి ఒక పనిని ఎంచుకోండి:',
   sendPhotoChip: 'WhatsApp లో ఫోటో పంపండి',
   setAlarmChip: 'అలారం సెట్ చేయండి',
   wifiChip: 'Wi-Fi ఆన్ చేయండి',

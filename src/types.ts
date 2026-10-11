@@ -52,7 +52,7 @@ export interface ChatMessage {
 }
 
 // Intent classification
-export type IntentType = 'send-photo' | 'set-alarm' | 'turn-on-wifi' | 'unknown' | 'ambiguous';
+export type IntentType = 'send-photo' | 'set-alarm' | 'turn-on-wifi' | 'manual' | 'unknown' | 'ambiguous';
 
 export interface ClassifiedIntent {
   type: IntentType;

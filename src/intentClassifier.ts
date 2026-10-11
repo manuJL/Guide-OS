@@ -8,6 +8,8 @@ const intentKeywords: Record<IntentType, string[]> = {
     'send picture', 'send image', 'share image', 'share picture', 'send a photo',
     'share a photo', 'sending photo', 'sending a photo', 'how to send photo',
     'how to share photo', 'show me how to send', 'photo share', 'pic send',
+    'send a pic', 'share a pic', 'how do i send a photo', 'how do i send',
+    'photo tutorial', 'how to send a photo',
     // Hindi
     'फोटो', 'तस्वीर', 'भेजना', 'भेजो', 'भेजें', 'शेयर', 'फोटो भेजना',
     'फोटो भेजो', 'तस्वीर भेजो', 'व्हाट्सएप फोटो', 'फोटो भेजना सिखाओ',
@@ -15,13 +17,14 @@ const intentKeywords: Record<IntentType, string[]> = {
     // Telugu
     'ఫోటో', 'చిత్రం', 'పంపు', 'పంపాలి', 'పంపండి', 'షేర్', 'ఫోటో పంపు',
     'ఫోటో పంపండి', 'చిత్రం పంపు', 'ఫోటో ఎలా పంపాలో', 'చూపించు',
-    'పంపాలో', 'ఫోటో పంపాలి',
+    'పంపాలో', 'ఫోటో పంపాలి', 'ఫోటో పంపడం ఎలా',
   ],
   'set-alarm': [
     // English
     'alarm', 'set alarm', 'wake up', 'morning alarm', 'alarm clock',
     'set an alarm', 'set the alarm', 'create alarm', 'add alarm',
-    'how to set alarm', 'wake me up', 'alarm set',
+    'how to set alarm', 'wake me up', 'alarm set', 'how to set an alarm',
+    'remind me', 'set the alarm clock', 'alarm tutorial',
     // Hindi
     'अलार्म', 'अलार्म सेट', 'अलार्म लगाओ', 'अलार्म लगाना', 'जगाना',
     'सुबह', 'अलार्म कैसे', 'अलार्म बजाओ', 'अलार्म सेट करें',
@@ -35,7 +38,9 @@ const intentKeywords: Record<IntentType, string[]> = {
     // English
     'wifi', 'wi-fi', 'wireless', 'internet', 'turn on wifi', 'enable wifi',
     'connect wifi', 'wifi on', 'turn on wi-fi', 'enable wi-fi',
-    'how to turn on wifi', 'wifi connect', 'net on', 'internet on',
+    'how to turn on wifi', 'how to turn on wi-fi', 'wifi connect', 'net on',
+    'internet on', 'turn the wifi on', 'switch on wifi', 'wifi tutorial',
+    'show me how to turn on',
     // Hindi
     'वाईफाई', 'वाई-फाई', 'इंटरनेट', 'वाईफाई चालू', 'वाईफाई ऑन',
     'नेट चालू', 'इंटरनेट चालू', 'वाईफाई कैसे', 'wifi चालू',
@@ -43,6 +48,7 @@ const intentKeywords: Record<IntentType, string[]> = {
     'వైఫై', 'వై-ఫై', 'ఇంటర్నెట్', 'వైఫై ఆన్', 'వైఫై చేయి',
     'నెట్ ఆన్', 'ఇంటర్నెట్ ఆన్', 'వైఫై ఎలా',
   ],
+  'manual': [],
   'unknown': [],
   'ambiguous': [],
 };
@@ -91,6 +97,19 @@ export function classifyIntent(input: string): ClassifiedIntent {
   const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
   if (entries.length === 0) {
+    // Generic manual/guide/help requests open the task picker instead of being
+    // rejected as unsupported. This only runs when no concrete task matched.
+    const manualKeywords = [
+      'manual', 'guide', 'handbook', 'help', 'how do i', 'how to', 'teach me',
+      'teach me how', 'walk me through', 'step by step', 'learn',
+      'मैन्युअल', 'मैनुअल', 'गाइड', 'मदद', 'सिखाओ', 'कैसे',
+      'మాన్యువల్', 'గైడ్', 'సహాయం', 'నేర్పించు', 'ఎలా',
+    ];
+    for (const keyword of manualKeywords) {
+      if (normalizedInput.includes(keyword)) {
+        return { type: 'manual', confidence: 0.5, detectedLanguage };
+      }
+    }
     return { type: 'unknown', confidence: 0, detectedLanguage };
   }
 
